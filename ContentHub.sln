@@ -1,8 +1,27 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentHub.Frontend", "ContentHub.Frontend\ContentHub.Frontend.csproj", "{7E57C18B-5DDE-4631-B900-33DF15DF0401}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E7897BB9-118E-4B2D-B480-E8BF0FEFE0E6}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentHub.API", "ContentHub.API\ContentHub.API.csproj", "{D995BE8C-1843-48EF-A9B2-83913EB56EC1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7E57C18B-5DDE-4631-B900-33DF15DF0401}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E57C18B-5DDE-4631-B900-33DF15DF0401}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E57C18B-5DDE-4631-B900-33DF15DF0401}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E57C18B-5DDE-4631-B900-33DF15DF0401}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D995BE8C-1843-48EF-A9B2-83913EB56EC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D995BE8C-1843-48EF-A9B2-83913EB56EC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D995BE8C-1843-48EF-A9B2-83913EB56EC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D995BE8C-1843-48EF-A9B2-83913EB56EC1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
