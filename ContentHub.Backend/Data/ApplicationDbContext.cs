@@ -1,12 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace ContentHub.Backend.Data;
 
-public class AppDbContext : DbContext
+public class ApplicationDbContext : IdentityDbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
     {
     }
+
 
 
     public DbSet<Article> Articles { get; set; }
@@ -19,4 +22,3 @@ public class AppDbContext : DbContext
 
 
 
-//TODO : ADD THE CODE TO THE CLASSES AND ADD THEM TO DATABASE AND ADD APPSETING JASON ASWELL
