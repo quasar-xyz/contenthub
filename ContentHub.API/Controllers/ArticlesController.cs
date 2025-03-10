@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ContentHub.Frontend.Data;
@@ -16,14 +17,14 @@ namespace ContentHub.API.Controllers
             _context = context;
         }
         
-        // ✅ API Test Endpoint
+ 
         [HttpGet("test")]
         public IActionResult Test()
         {
             return Ok("API is working");
         }
 
-        // ✅ Get all articles
+    
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -31,7 +32,46 @@ namespace ContentHub.API.Controllers
             return Ok(articles);
         }
 
-        // ✅ Get article by ID
+       
+        [HttpPost("{articleId}/like")]
+        public async Task<IActionResult> LikeArticle(int articleId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var existingLike = await _context.Likes
+                .FirstOrDefaultAsync(l => l.ArticleId == articleId && l.UserId == userId);
+
+            if (existingLike != null)
+            {
+                return Conflict("User already liked this article.");
+            }
+
+            var like = new Like
+            {
+                UserId = userId,
+                ArticleId = articleId
+            };
+
+            _context.Likes.Add(like);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+       
+        
+        
+        [HttpGet("{articleId}/likes")]
+        public async Task<IActionResult> GetLikeCount(int articleId)
+        {
+            var likeCount = await _context.Likes.CountAsync(l => l.ArticleId == articleId);
+            return Ok(likeCount);
+        }
+        
+        
+        
+        
+      
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -42,8 +82,10 @@ namespace ContentHub.API.Controllers
             }
             return Ok(article);
         }
+        
+        
 
-        // ✅ Create new article
+      
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Article article)
         {
@@ -58,34 +100,19 @@ namespace ContentHub.API.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = article.ArticleId }, article);
         }
+        
+        
+        
 
-        // ✅ Edit article
+       
         [HttpPut("{id}")]
         public async Task<IActionResult> Edit(int id, [FromBody] Article updatedArticle)
         {
-            if (id != updatedArticle.ArticleId)
-            {
-                return BadRequest("ID mismatch");
-            }
-
-            var existingArticle = await _context.Articles.FindAsync(id);
-            if (existingArticle == null)
-            {
-                return NotFound();
-            }
-
-            existingArticle.Title = updatedArticle.Title;
-            existingArticle.Content = updatedArticle.Content;
-            existingArticle.CategoryId = updatedArticle.CategoryId;
-            existingArticle.PublishDate = DateTime.UtcNow; // Keeping it updated when modified
-
-            _context.Articles.Update(existingArticle);
-            await _context.SaveChangesAsync();
-
-            return NoContent(); // HTTP 204 - No Content (successful update)
+            
+            return NoContent();
         }
 
-        // ✅ Delete article
+       
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
