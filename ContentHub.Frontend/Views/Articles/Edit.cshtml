@@ -1,9 +1,39 @@
-﻿@model dynamic
+﻿@model ContentHub.Frontend.Tables.Article
 
 @{
-    ViewBag.Title = "title";
+    ViewBag.Title = "Edit Article";
     Layout = "_Layout";
 }
 
-<h2>title</h2>
+<div class="container mt-4">
+    <h2 class="text-center">Edit Article</h2>
 
+    <form asp-action="Edit" asp-route-id="@Model.ArticleId" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="Title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="Title" name="Title" value="@Model.Title" required />
+        </div>
+
+     
+        <div class="mb-3">
+            <label for="Category" class="form-label">Category</label>
+            <p>@Model.Category?.CategoryName</p>
+            <input type="hidden" name="CategoryId" value="@Model.CategoryId" />
+        </div>
+
+        <div class="mb-3">
+            <label for="Content" class="form-label">Content</label>
+            <textarea class="form-control" id="Content" name="Content" rows="4" required>@Model.Content</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="Photo" class="form-label">Upload New Photo (optional)</label>
+            <input type="file" class="form-control" id="Photo" name="Photo" />
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="@Url.Action("ViewArticle", "Articles", new { id = Model.ArticleId })" class="btn btn-secondary">Back</a>
+        </div>
+    </form>
+</div>

@@ -26,4 +26,6 @@ public class Article
     public ICollection<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();
     
     public ICollection<Like> Likes { get; set; } = new List<Like>();
+    
+    public string? PhotoPath { get; set; } 
 }

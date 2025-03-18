@@ -8,5 +8,5 @@ public class Bookmark
     public DateTime BookmarkDate { get; set; }
 
    
-    public Article Article { get; set; }
+    public Article? Article { get; set; }
 }
