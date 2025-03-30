@@ -1,81 +1,99 @@
-﻿@using Microsoft.EntityFrameworkCore
-@model IEnumerable<ContentHub.Frontend.Tables.Article>
+﻿@model IEnumerable<ContentHub.Frontend.Tables.Article>
 
 @{
     ViewBag.Title = "Articles";
     Layout = "_Layout";
     var currentUserId = ViewBag.CurrentUserId as string;
+    var authors = ViewBag.Authors as Dictionary<string, IdentityUser>;
 }
 
-<div class="container mt-5">
-    <h2 class="text-center mb-4 display-4">Latest Articles</h2>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <h3>Categories</h3>
+            <div class="list-group">
+                @foreach (var category in ViewBag.Categories)
+                {
+                    <a href="@Url.Action("CategoryPage", "Articles", new { categoryName = category.CategoryName })" class="list-group-item list-group-item-action">
+                        @category.CategoryName
+                    </a>
+                }
+            </div>
 
-    
-    <div class="text-end mb-4">
-        <a href="@Url.Action("Create", "Articles")" class="btn btn-primary btn-lg">+ Create New Article</a>
-    </div>
+            <a href="@Url.Action("CreateCommunity", "Articles")" class="btn btn-primary mt-3">Create New Community</a>
+        </div>
+        
+        <div class="col-md-9">
+            <h2 class="text-center mb-4">Latest Articles</h2>
 
-    
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="text-end mb-4">
+                <a href="@Url.Action("Bookmarks", "Articles")" class="btn btn-primary">📌 My Bookmarks</a>
+                <a href="@Url.Action("Create", "Articles")" class="btn btn-primary">+ Create New Article</a>
+            </div>
 
-        @foreach (var article in Model)
-        {
-            <div class="col">
-                <div class="card h-100 shadow-lg border-light rounded-3">
-                    <div class="card-body">
+            @foreach (var article in Model)
+            {
+              
+                var author = authors[article.AuthorId];
 
-                        
-                        <h5 class="card-title text-primary fw-bold fs-4">@article.Title</h5>
-
-                        
-                        <p class="card-text text-muted">
-                            @article.Category?.CategoryName •
-                            <span class="fw-light">@article.PublishDate.ToString("yyyy-MM-dd")</span>
-                        </p>
-
-                        
-                        @if (!string.IsNullOrEmpty(article.PhotoPath))
-                        {
-                            <div class="mb-3 text-center">
-                                <img src="@Url.Content(article.PhotoPath)" alt="Article Photo" class="img-fluid rounded-3" style="max-height: 250px; object-fit: cover;" />
+                <div class="reddit-card">
+                    <div class="reddit-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h5 class="reddit-title">@article.Title</h5>
+                            <div class="reddit-meta">
+                                Posted by
+                                <a href="@Url.Action("AuthorPage", "Articles", new { id = article.AuthorId })" class="author-link">
+                                    <strong>@author?.UserName</strong>
+                                </a>
+                                in <strong>@article.Category?.CategoryName</strong> • @article.PublishDate.ToString("yyyy-MM-dd")
                             </div>
-                        }
+                        </div>
 
-                        
-                        <p class="card-text text-truncate" style="max-height: 150px; overflow: hidden;">@article.Content</p>
-
+                        <form asp-action="Bookmark" asp-controller="Articles" asp-route-articleId="@article.ArticleId" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn-reddit btn-bookmark">⭐ Bookmark</button>
+                        </form>
                     </div>
 
-                    
-                    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                    @if (!string.IsNullOrEmpty(article.PhotoPath))
+                    {
+                        <img src="@Url.Content(article.PhotoPath)" alt="Article Image" class="reddit-image" />
+                    }
 
+                    <div class="reddit-content">
+                        @{
+                            var contentPreview = article.Content.Length > 200
+                                ? article.Content.Substring(0, 200) + "..."
+                                : article.Content;
+                        }
+                        @contentPreview
+                    </div>
 
-                        <form asp-action="Like" asp-controller="Articles" asp-route-articleId="@article.ArticleId" method="post">
-                            <button type="submit" class="btn btn-sm btn-outline-success rounded-pill">
-                                <i class="bi bi-hand-thumbs-up"></i> Like
+                    <div class="reddit-actions">
+                        <form asp-action="Like" asp-controller="Articles" asp-route-articleId="@article.ArticleId" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                👍 Like
                             </button>
                         </form>
-
-                        
-                        <span id="like-count-@article.ArticleId" class="text-muted">
+                        <span class="text-muted mx-2">
                             @article.Likes?.Count() Likes
                         </span>
 
-                        
-                        <a asp-action="ViewArticle" asp-controller="Articles" asp-route-id="@article.ArticleId" class="btn btn-sm btn-outline-primary rounded-pill">
-                            <i class="bi bi-eye"></i> View
+                        <a asp-action="ViewArticle" asp-controller="Articles" asp-route-id="@article.ArticleId" class="btn btn-sm btn-outline-primary">
+                            👁 View
                         </a>
 
-                        
-                        <form asp-action="DeleteConfirmed" asp-route-id="@article.ArticleId" method="post" class="d-inline-block">
-                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">
-                                <i class="bi bi-trash"></i> Delete
-                            </button>
-                        </form>
+                        @if(article.AuthorId == currentUserId)
+                        {
+                            <form asp-action="DeleteConfirmed" asp-route-id="@article.ArticleId" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    🗑 Delete
+                                </button>
+                            </form>
+                        }
                     </div>
                 </div>
-            </div>
-        }
-
+            }
+        </div>
     </div>
 </div>

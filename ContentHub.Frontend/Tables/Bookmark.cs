@@ -3,7 +3,7 @@
 public class Bookmark
 {
     public int BookmarkId { get; set; }
-    public int UserId { get; set; }
+    public string UserId { get; set; } = string.Empty;
     public int ArticleId { get; set; }
     public DateTime BookmarkDate { get; set; }
 

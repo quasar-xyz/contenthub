@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace ContentHub.Frontend.Tables;
 
@@ -23,6 +24,7 @@ public class Article
     
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     
+    [JsonIgnore]
     public ICollection<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();
     
     public ICollection<Like> Likes { get; set; } = new List<Like>();

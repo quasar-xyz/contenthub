@@ -1,0 +1,29 @@
+﻿@model ContentHub.Frontend.Tables.Category
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Create Community";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Create a New Community</h2>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form asp-action="CreateCommunity" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
+                <div class="form-group mb-3">
+                    <label for="CategoryName" class="form-label">Community Name</label>
+                    <input type="text" class="form-control" id="CategoryName" name="CategoryName" placeholder="Enter community name" required />
+                    <div class="invalid-feedback">
+                        Please provide a community name.
+                    </div>
+                </div>
+                
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">Create Community</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

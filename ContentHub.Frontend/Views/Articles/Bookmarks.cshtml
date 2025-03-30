@@ -1,0 +1,64 @@
+﻿@using ContentHub.Frontend.Tables
+@model IEnumerable<Article>
+
+@{
+    ViewBag.Title = "My Bookmarks";
+    Layout = "_Layout";
+}
+
+<div class="article-feed">
+    <h2 class="text-center mb-4">My Bookmarked Articles</h2>
+
+    <div class="text-end mb-4">
+        <a href="@Url.Action("ArticlePage", "Articles")" class="btn btn-secondary">⬅ Back to All Articles</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <p class="text-muted text-center">You have no bookmarked articles yet.</p>
+    }
+    else
+    {
+        @foreach (var article in Model)
+        {
+            <div class="reddit-card">
+                <div class="reddit-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h5 class="reddit-title">@article.Title</h5>
+                        <div class="reddit-meta">
+                            Posted in <strong>@article.Category?.CategoryName</strong> • @article.PublishDate.ToString("yyyy-MM-dd")
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(article.PhotoPath))
+                {
+                    <img src="@Url.Content(article.PhotoPath)" alt="Article Image" class="reddit-image" />
+                }
+
+                <div class="reddit-content">
+                    @{
+                        var contentPreview = article.Content.Length > 200
+                            ? article.Content.Substring(0, 200) + "..."
+                            : article.Content;
+                    }
+                    @contentPreview
+                </div>
+
+                <div class="reddit-actions">
+                    <a asp-action="ViewArticle" asp-controller="Articles" asp-route-id="@article.ArticleId" class="btn btn-sm btn-outline-primary">
+                        👁 View
+                    </a>
+                    <form asp-action="Like" asp-controller="Articles" asp-route-articleId="@article.ArticleId" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-success">
+                            👍 Like
+                        </button>
+                    </form>
+                    <span class="text-muted mx-2">
+                        @article.Likes?.Count() Likes
+                    </span>
+                </div>
+            </div>
+        }
+    }
+</div>

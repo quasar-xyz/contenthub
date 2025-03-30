@@ -1,0 +1,11 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model ContentHub.Frontend.Tables.Category
+<h2>Create Community</h2>
+
+<form asp-action="CreateCategory" method="post">
+    <div class="form-group">
+        <label>Community Name</label>
+        <input asp-for="CategoryName" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>

@@ -1,0 +1,93 @@
+﻿@using ContentHub.Frontend.Tables
+@model IEnumerable<ContentHub.Frontend.Tables.Article>
+
+@{
+    ViewBag.Title = "Articles in Category";
+    Layout = "_Layout";
+    var currentUserId = ViewBag.CurrentUserId as string;
+}
+
+<div class="container">
+    <div class="row">
+        <!-- Sidebar (Categories) -->
+        <div class="col-md-3">
+            <h3>Categories</h3>
+            <div class="list-group">
+                @foreach (var category in ViewBag.Categories)
+                {
+                    <a href="@Url.Action("CategoryPage", "Articles", new { categoryName = category.CategoryName })" class="list-group-item list-group-item-action">
+                        @category.CategoryName
+                    </a>
+                }
+            </div>
+
+            <a href="@Url.Action("CreateCommunity", "Articles")" class="btn btn-primary mt-3">Create New Community</a>
+        </div>
+
+        <!-- Main Content (Articles) -->
+        <div class="col-md-9">
+            <h2 class="text-center mb-4">Articles in @ViewBag.CategoryName</h2>
+
+            <div class="text-end mb-4">
+                <a href="@Url.Action("Bookmarks", "Articles")" class="btn btn-primary">📌 My Bookmarks</a>
+                <a href="@Url.Action("Create", "Articles")" class="btn btn-primary">+ Create New Article</a>
+            </div>
+
+            @foreach (var article in Model)
+            {
+                <div class="reddit-card">
+                    <div class="reddit-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h5 class="reddit-title">@article.Title</h5>
+                            <div class="reddit-meta">
+                                Posted in <strong>@article.Category?.CategoryName</strong> • @article.PublishDate.ToString("yyyy-MM-dd")
+                            </div>
+                        </div>
+
+                        <form asp-action="Bookmark" asp-controller="Articles" asp-route-articleId="@article.ArticleId" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn-reddit btn-bookmark">⭐ Bookmark</button>
+                        </form>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(article.PhotoPath))
+                    {
+                        <img src="@Url.Content(article.PhotoPath)" alt="Article Image" class="reddit-image" />
+                    }
+
+                    <div class="reddit-content">
+                        @{
+                            var contentPreview = article.Content.Length > 200
+                                ? article.Content.Substring(0, 200) + "..."
+                                : article.Content;
+                        }
+                        @contentPreview
+                    </div>
+
+                    <div class="reddit-actions">
+                        <form asp-action="Like" asp-controller="Articles" asp-route-articleId="@article.ArticleId" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                👍 Like
+                            </button>
+                        </form>
+                        <span class="text-muted mx-2">
+                            @article.Likes?.Count() Likes
+                        </span>
+
+                        <a asp-action="ViewArticle" asp-controller="Articles" asp-route-id="@article.ArticleId" class="btn btn-sm btn-outline-primary">
+                            👁 View
+                        </a>
+                        @if(article.AuthorId == currentUserId)
+                        {
+                        <form asp-action="DeleteConfirmed" asp-route-id="@article.ArticleId" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                🗑 Delete
+                            </button>
+                        </form>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -49,7 +49,48 @@ namespace ContentHub.API.Controllers
             return Ok(existingArticle); 
         }
 
+        [HttpPost("bookmark")]
+        public async Task<IActionResult> CreateBookmark([FromBody] Bookmark bookmark)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var existingBookmark = await _context.Bookmarks
+                .FirstOrDefaultAsync(b => b.UserId == bookmark.UserId && b.ArticleId == bookmark.ArticleId);
+            
+            bookmark.BookmarkDate = DateTime.UtcNow;
+
+            _context.Bookmarks.Add(bookmark);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetBookmarkById), new { id = bookmark.BookmarkId }, bookmark);
+        }
         
+        [HttpGet("bookmarks/{userId}")]
+        public async Task<IActionResult> GetBookmarkedArticles(string userId)
+        {
+            var bookmarkedArticles = await _context.Articles
+                .Where(a => a.Bookmarks.Any(b => b.UserId == userId))  // Only get bookmarked articles
+                .Select(a => new
+                {
+                    a.ArticleId,
+                    a.Title,
+                    a.PhotoPath,
+                    a.PublishDate
+                })
+                .ToListAsync();
+
+            return Ok(bookmarkedArticles);
+        }
+
+
+        [HttpGet("bookmark/{id}")]
+        public async Task<IActionResult> GetBookmarkById(int id)
+        {
+            var bookmark = await _context.Bookmarks.FindAsync(id);
+            return bookmark == null ? NotFound() : Ok(bookmark);
+        }
+
         
         
         [HttpGet]
@@ -70,6 +111,8 @@ namespace ContentHub.API.Controllers
 
             return article == null ? NotFound() : Ok(article);
         }
+        
+      
 
         [HttpPost("like")]
         public async Task<IActionResult> CreateLike([FromBody] Like like)
@@ -81,12 +124,7 @@ namespace ContentHub.API.Controllers
 
             var existingLike = await _context.Likes
                 .FirstOrDefaultAsync(l => l.UserId == like.UserId && l.ArticleId == like.ArticleId);
-
-            if (existingLike != null)
-            {
-                return BadRequest("User has already liked this article.");
-            }
-
+            
             _context.Likes.Add(like);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetLikeById), new { id = like.LikeId }, like);
@@ -120,6 +158,32 @@ namespace ContentHub.API.Controllers
             return comment == null ? NotFound() : Ok(comment);
         }
         
+        [HttpGet("articles")]
+        public async Task<IActionResult> GetArticlesByIds([FromQuery] List<int> ids)
+        {
+            
+            var articles = await _context.Articles
+                .Where(a => ids.Contains(a.ArticleId))
+                .ToListAsync();
+
+            return Ok(articles);
+        }
+
+       
+        [HttpGet("category/{categoryName}")]
+        public async Task<IActionResult> GetArticlesByCategory(string categoryName)
+        {
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(c => c.CategoryName.ToLower() == categoryName.ToLower());
+
+            var articles = await _context.Articles
+                .Where(a => a.CategoryId == category.CategoryId)
+                .Include(a => a.Category)
+                .ToListAsync();
+
+            return Ok(articles);
+        }
+
         
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Article article)

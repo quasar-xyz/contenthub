@@ -1,4 +1,5 @@
-﻿@model ContentHub.Frontend.Tables.Article
+﻿@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@model ContentHub.Frontend.Tables.Article
 
 @{
     ViewBag.Title = Model.Title;
@@ -33,16 +34,21 @@
         <a href="@Url.Action("ArticlePage", "Articles")" class="btn btn-outline-secondary btn-lg me-3">
             <i class="bi bi-arrow-left-circle"></i> Back to Articles
         </a>
-        <a href="@Url.Action("Edit", "Articles", new { id = Model.ArticleId })" class="btn btn-outline-warning btn-lg">
-            <i class="bi bi-pencil"></i> Edit Article
-        </a>
+        @if (Model.AuthorId == ViewBag.CurrentUserId)
+        {
+            <a href="@Url.Action("Edit", "Articles", new { id = Model.ArticleId })" class="btn btn-outline-warning btn-lg">
+                <i class="bi bi-pencil"></i> Edit Article
+            </a>
 
         
-        <form asp-action="DeleteConfirmed" asp-route-id="@Model.ArticleId" method="post" class="d-inline-block">
-            <button type="submit" class="btn btn-outline-danger btn-lg">
-                <i class="bi bi-trash"></i> Delete Article
-            </button>
-        </form>
+            <form asp-action="DeleteConfirmed" asp-route-id="@Model.ArticleId" method="post" class="d-inline-block">
+                <button type="submit" class="btn btn-outline-danger btn-lg">
+                    <i class="bi bi-trash"></i> Delete Article
+                </button>
+            </form>
+        }
+        
+        
     </div>
 
    
